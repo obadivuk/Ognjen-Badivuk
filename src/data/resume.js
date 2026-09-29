@@ -32,6 +32,12 @@ export const profile = {
   backdropSmall: '/ognjen-backdrop-sm.webp',
   resumeFile: '/Ognjen_Badivuk_CV.pdf',
   available: true,
+  /**
+   * Formspree endpoint the contact form POSTs to. Public by design — it's a
+   * write-only submission URL, not a secret, and it has to ship in the client
+   * bundle to work. Manage submissions and spam filtering at formspree.io.
+   */
+  formEndpoint: 'https://formspree.io/f/mrpbravl',
 }
 
 export const summary = `Backend and Application Engineer with 3+ years of professional experience building and maintaining high-reliability data scraping systems, RESTful API integrations, and ETL pipelines at scale. Proficient in PHP (Laravel) and Python, with a strong track record of improving data quality, reducing pipeline failures, and owning complex features end-to-end at Better Collective — a global leader in sports betting media. Currently advancing the scraping architecture with a focus on robustness, observability, and maintainability. M.Sc. candidate in Software and Data Engineering.`

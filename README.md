@@ -87,19 +87,22 @@ to `overflow` (capturing and restoring the offset by hand) when Lenis is off.
 
 ## The contact form
 
-It's front-end only: it validates, then hands the message to the visitor's mail client via a
-`mailto:` URL. To make it send server-side, replace the marked block in
-`src/components/Contact.jsx` (`handleSubmit`) with a POST — e.g. Formspree:
+It really sends. `handleSubmit` in `src/components/Contact.jsx` POSTs JSON to the Formspree
+endpoint in `profile.formEndpoint` (`src/data/resume.js`). That URL is public by design — it's
+a write-only submission endpoint, not a secret, and it has to ship in the client bundle.
 
-```js
-await fetch('https://formspree.io/f/<your-id>', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify(form),
-})
-```
+This uses Formspree's plain `fetch` integration rather than the `@formspree/react` package.
+The package's `useForm` / `ValidationError` helpers own validation and submission state, which
+would mean tearing out the floating-label fields, the inline validation and the animated
+`idle → sending → sent | error` panels that are already here. The request on the wire is
+identical. To switch anyway: `npm i @formspree/react`, then rebuild the form around `useForm`.
 
-The `sending` → `sent` states are already wired, so only the network call changes.
+Four states, and no silent failures — a non-2xx response or a network error lands on a real
+error panel that keeps the typed message, offers a retry, and falls back to a pre-filled
+`mailto:` link. `_subject` sets the subject line of the notification Formspree emails you.
+
+Free tier is 50 submissions/month. Formspree may hold the very first submission until you
+confirm it from your dashboard.
 
 ## Palette
 

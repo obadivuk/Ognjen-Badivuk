@@ -112,7 +112,8 @@ const SOCIALS = [
 export default function Contact() {
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' })
   const [errors, setErrors] = useState({})
-  const [status, setStatus] = useState('idle') // idle | sending | sent
+  const [status, setStatus] = useState('idle') // idle | sending | sent | error
+  const [errorDetail, setErrorDetail] = useState('')
 
   const set = (key) => (value) => {
     setForm((f) => ({ ...f, [key]: value }))
@@ -129,25 +130,53 @@ export default function Contact() {
     return Object.keys(next).length === 0
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!validate()) return
 
     setStatus('sending')
+    setErrorDetail('')
 
-    // Front-end only: hands the message to the visitor's mail client.
-    // Swap this block for a Formspree / Resend / API call — see README.
-    const subject = encodeURIComponent(form.subject || `Portfolio enquiry from ${form.name}`)
-    const body = encodeURIComponent(`${form.message}\n\n— ${form.name}\n${form.email}`)
+    try {
+      const res = await fetch(profile.formEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          // Becomes the subject line of the notification Formspree sends you.
+          _subject: form.subject || `Portfolio enquiry from ${form.name}`,
+          subject: form.subject,
+          message: form.message,
+        }),
+      })
 
-    window.setTimeout(() => {
-      window.location.href = `mailto:${profile.email}?subject=${subject}&body=${body}`
-      setStatus('sent')
-    }, 700)
+      if (res.ok) {
+        setStatus('sent')
+        return
+      }
+
+      // Formspree reports validation and quota problems in the body, not just
+      // the status code — surface its wording rather than a generic failure.
+      const data = await res.json().catch(() => null)
+      setErrorDetail(data?.errors?.map((x) => x.message).join(' ') || `Server responded ${res.status}.`)
+      setStatus('error')
+    } catch {
+      // Offline, DNS failure, or the request was blocked before it left.
+      setErrorDetail('The request never reached the server — check your connection.')
+      setStatus('error')
+    }
   }
 
   const reset = () => {
     setForm({ name: '', email: '', subject: '', message: '' })
+    setErrorDetail('')
+    setStatus('idle')
+  }
+
+  /** Back to the filled-in form so a failed send can be retried as-is. */
+  const retry = () => {
+    setErrorDetail('')
     setStatus('idle')
   }
 
@@ -254,10 +283,11 @@ export default function Contact() {
                     </svg>
                   </motion.span>
                   <h3 className="mt-6 font-display text-2xl font-bold text-white">
-                    Your mail client is open
+                    Message sent
                   </h3>
                   <p className="mt-3 max-w-sm text-sm leading-relaxed text-sage/70">
-                    Hit send there and it lands in my inbox. If nothing opened, write to{' '}
+                    It's in my inbox — I'll get back to you within a day. You can also reach me
+                    directly at{' '}
                     <a href={`mailto:${profile.email}`} className="text-accent underline underline-offset-4">
                       {profile.email}
                     </a>
@@ -270,6 +300,51 @@ export default function Contact() {
                   >
                     ← Write another
                   </button>
+                </motion.div>
+              ) : status === 'error' ? (
+                <motion.div
+                  key="error"
+                  initial={{ opacity: 0, scale: 0.94 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.94 }}
+                  transition={{ duration: 0.5, ease: EASE }}
+                  className="flex min-h-[420px] flex-col items-center justify-center text-center"
+                >
+                  <motion.span
+                    className="grid h-16 w-16 place-items-center rounded-full border border-red-400/40 bg-red-400/10"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: 'spring', stiffness: 260, damping: 16 }}
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" strokeWidth="2.2" className="h-7 w-7 stroke-red-300">
+                      <path d="M12 7v6M12 17v.01" strokeLinecap="round" />
+                      <circle cx="12" cy="12" r="9" />
+                    </svg>
+                  </motion.span>
+                  <h3 className="mt-6 font-display text-2xl font-bold text-white">
+                    That didn't go through
+                  </h3>
+                  <p className="mt-3 max-w-sm text-sm leading-relaxed text-sage/70">
+                    {errorDetail} Your message is still here — retry, or email me directly at{' '}
+                    <a href={`mailto:${profile.email}`} className="text-accent underline underline-offset-4">
+                      {profile.email}
+                    </a>
+                    .
+                  </p>
+                  <div className="mt-8 flex items-center gap-6">
+                    <MagneticButton onClick={retry} variant="outline">
+                      Try again
+                    </MagneticButton>
+                    <a
+                      href={`mailto:${profile.email}?subject=${encodeURIComponent(
+                        form.subject || `Portfolio enquiry from ${form.name}`
+                      )}&body=${encodeURIComponent(`${form.message}\n\n— ${form.name}\n${form.email}`)}`}
+                      data-cursor="hover"
+                      className="font-mono text-xs uppercase tracking-[0.2em] text-sage/50 transition-colors hover:text-accent"
+                    >
+                      Open mail app
+                    </a>
+                  </div>
                 </motion.div>
               ) : (
                 <motion.form
@@ -302,7 +377,12 @@ export default function Contact() {
                     <p className="font-mono text-[11px] text-sage/35">
                       Or just email me directly.
                     </p>
-                    <MagneticButton type="submit" variant="solid">
+                    <MagneticButton
+                      type="submit"
+                      variant="solid"
+                      disabled={status === 'sending'}
+                      className={status === 'sending' ? 'pointer-events-none opacity-80' : ''}
+                    >
                       {status === 'sending' ? (
                         <>
                           Sending
