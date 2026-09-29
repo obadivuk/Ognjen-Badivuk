@@ -1,0 +1,177 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --ink: #111613;
+    --surface: #1b2420;
+    --accent: #4e9f3d;
+    --sage: #a3c1ad;
+  }
+
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html {
+    background-color: var(--ink);
+  }
+
+  body {
+    @apply bg-ink text-white font-sans antialiased;
+    overflow-x: hidden;
+  }
+
+  /* Lenis smooth scroll requirements */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+
+  ::selection {
+    background: rgba(78, 159, 61, 0.35);
+    color: #fff;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0d110f;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #24302a;
+    border-radius: 999px;
+    border: 2px solid #0d110f;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3a5a33;
+  }
+
+  /* Hide the native cursor only where the custom cursor is active */
+  body.has-custom-cursor,
+  body.has-custom-cursor * {
+    cursor: none !important;
+  }
+
+  input:-webkit-autofill,
+  textarea:-webkit-autofill {
+    -webkit-text-fill-color: #fff;
+    -webkit-box-shadow: 0 0 0 1000px #1b2420 inset;
+    transition: background-color 9999s ease-in-out 0s;
+  }
+}
+
+@layer components {
+  .container-x {
+    @apply mx-auto w-full max-w-6xl px-6 sm:px-8;
+  }
+
+  /* Frosted card with a sage hairline border */
+  .glass {
+    @apply rounded-2xl border border-sage/10 bg-surface/70 backdrop-blur-xl;
+  }
+
+  /* Gradient text using the palette */
+  .text-gradient {
+    @apply bg-gradient-to-br from-white via-white to-sage bg-clip-text text-transparent;
+  }
+
+  .text-gradient-accent {
+    @apply bg-gradient-to-br from-accent-soft via-accent to-accent-deep bg-clip-text text-transparent;
+  }
+
+  /*
+   * Per-character variants for the kinetic hero name. The ramp is vertical on
+   * purpose: every glyph shares the same line-box height, so applying it per
+   * character is indistinguishable from applying it across the whole word —
+   * and unlike an ancestor clip, it survives the 3D entrance transform.
+   */
+  .char-gradient {
+    @apply bg-gradient-to-b from-white via-white to-sage bg-clip-text text-transparent;
+  }
+
+  .char-gradient-accent {
+    @apply bg-gradient-to-b from-accent-soft via-accent to-accent-deep bg-clip-text text-transparent;
+    filter: drop-shadow(0 0 28px rgba(78, 159, 61, 0.35));
+  }
+
+  /* Small monospace eyebrow label */
+  .eyebrow {
+    @apply font-mono text-xs uppercase tracking-[0.3em] text-accent;
+  }
+
+  /* Animated conic border — used on hover for "glowing border" cards */
+  .glow-border {
+    position: relative;
+    isolation: isolate;
+  }
+  .glow-border::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(
+      from var(--angle, 0deg),
+      transparent 0%,
+      rgba(78, 159, 61, 0.9) 12%,
+      rgba(163, 193, 173, 0.6) 22%,
+      transparent 34%,
+      transparent 100%
+    );
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.45s ease;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .glow-border:hover::before {
+    opacity: 1;
+    animation: rotate-angle 3.5s linear infinite;
+  }
+
+  .noise::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}
+
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes rotate-angle {
+  to {
+    --angle: 360deg;
+  }
+}
+
+/* Respect the user's motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
