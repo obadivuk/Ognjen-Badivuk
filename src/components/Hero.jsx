@@ -134,7 +134,7 @@ export default function Hero() {
             <h1 className="font-display text-[clamp(2.9rem,8.5vw,6.2rem)] font-extrabold leading-[0.92] tracking-[-0.03em]">
               <span className="block">
                 <KineticWord text={profile.firstName} charClass="char-gradient" />
-              </span>
+              </span>{' '}
               <span className="relative block">
                 <KineticWord
                   text={profile.lastName}

@@ -127,7 +127,7 @@ export default function Experience() {
         <SectionHeading
           index="02"
           eyebrow="Experience"
-          title="Three years, one mission: data that arrives."
+          title="Four years, one mission: data that arrives."
           subtitle="From 200+ scrapers as a junior to architecting the framework they all run on."
         />
 
