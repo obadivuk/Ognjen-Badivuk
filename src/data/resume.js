@@ -12,7 +12,7 @@ export const profile = {
   firstName: 'Ognjen',
   lastName: 'Badivuk',
   title: 'Backend / Application Engineer',
-  disciplines: ['PHP', 'Python', 'Data Pipelines', 'Laravel'],
+  disciplines: ['PHP', 'Python', 'Data Pipelines', 'Laravel', 'Symfony'],
   tagline:
     'I build high-reliability scraping systems, REST API integrations and ETL pipelines that move tens of thousands of records a day — without blinking.',
   location: 'Niš, Serbia',
@@ -40,7 +40,7 @@ export const profile = {
   formEndpoint: 'https://formspree.io/f/mrpbravl',
 }
 
-export const summary = `Backend and Application Engineer with 3+ years of professional experience building and maintaining high-reliability data scraping systems, RESTful API integrations, and ETL pipelines at scale. Proficient in PHP (Laravel) and Python, with a strong track record of improving data quality, reducing pipeline failures, and owning complex features end-to-end at Better Collective — a global leader in sports betting media. Currently advancing the scraping architecture with a focus on robustness, observability, and maintainability. M.Sc. candidate in Software and Data Engineering.`
+export const summary = `Backend and Application Engineer with 3+ years of professional experience building and maintaining high-reliability data scraping systems, RESTful API integrations, and ETL pipelines at scale. Proficient in PHP (Laravel, Symfony) and Python, with a strong track record of improving data quality, reducing pipeline failures, and owning complex features end-to-end at Better Collective — a global leader in sports betting media. Currently advancing the scraping architecture with a focus on robustness, observability, and maintainability. M.Sc. candidate in Software and Data Engineering.`
 
 export const stats = [
   { value: 17000, suffix: '+', label: 'Scraping jobs run daily' },
@@ -200,7 +200,7 @@ export const skills = [
   {
     category: 'Frameworks',
     icon: 'layers',
-    items: ['Laravel', 'PHPUnit', 'pytest', 'unittest.mock'],
+    items: ['Laravel', 'Symfony', 'PHPUnit', 'pytest', 'unittest.mock'],
   },
   {
     category: 'Tools',
@@ -233,6 +233,7 @@ export const marqueeSkills = [
   'PHP',
   'Python',
   'Laravel',
+  'Symfony',
   'MySQL',
   'REST APIs',
   'ETL',

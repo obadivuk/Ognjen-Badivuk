@@ -105,7 +105,7 @@ def build_og_image():
     d.text((x, 248), 'Badivuk', font=font('Sora.ttf', 92, b'ExtraBold'), fill=ACCENT_SOFT)
     d.rounded_rectangle((x, 362, x + 260, 367), radius=3, fill=ACCENT)
     d.text((x, 396), 'Backend / Application Engineer', font=font('Sora.ttf', 32, b'SemiBold'), fill=(255, 255, 255))
-    d.text((x, 446), 'PHP · Python · Laravel · ETL pipelines', font=font('Sora.ttf', 24, b'Regular'), fill=SAGE)
+    d.text((x, 446), 'PHP · Python · Laravel · Symfony · ETL', font=font('Sora.ttf', 24, b'Regular'), fill=SAGE)
     d.text((x, 540), 'ognjenbadivuk.com', font=font('JetBrainsMono.ttf', 22, b'Medium'), fill=ACCENT_SOFT)
 
     card.save(os.path.join(OUT, 'og-image.jpg'), 'JPEG', quality=88, optimize=True, progressive=True)
