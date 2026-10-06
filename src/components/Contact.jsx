@@ -413,12 +413,13 @@ export default function Contact() {
           <p className="font-mono text-xs uppercase tracking-[0.3em] text-sage/40">
             Prefer the short version?
           </p>
-          <Magnetic strength={0.2} innerStrength={0.32}>
+          {/* 5.6vw keeps the 24-character address inside a 320px screen; anywhere-wrap is the backstop */}
+          <Magnetic strength={0.2} innerStrength={0.32} className="max-w-full">
             <a
               href={`mailto:${profile.email}`}
               data-cursor="view"
               data-cursor-label="Mail"
-              className="mt-5 inline-block font-display text-[clamp(1.8rem,6vw,4rem)] font-extrabold leading-none tracking-tight text-gradient transition-opacity duration-300 hover:opacity-90"
+              className="mt-5 inline-block max-w-full font-display text-[clamp(1.125rem,5.6vw,4rem)] font-extrabold leading-none tracking-tight text-gradient transition-opacity duration-300 [overflow-wrap:anywhere] hover:opacity-90"
             >
               {profile.email}
             </a>

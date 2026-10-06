@@ -117,14 +117,33 @@
       }
     </script>
 
+    <!-- Hero portrait is the largest element on first paint; start fetching it before the JS runs -->
+    <link
+      rel="preload"
+      as="image"
+      href="/ognjen-portrait.webp"
+      imagesrcset="/ognjen-portrait-sm.webp 520w, /ognjen-portrait.webp 1000w"
+      imagesizes="(max-width: 640px) 78vw, (max-width: 1024px) 60vw, 34vw"
+      fetchpriority="high"
+    />
+
+    <!-- Fonts load without blocking first paint (display=swap shows system fonts meanwhile) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
+      rel="preload"
+      as="style"
       href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
-      rel="stylesheet"
+      onload="this.onload=null;this.rel='stylesheet'"
     />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      />
+    </noscript>
   </head>
-  <body class="bg-ink">
+  <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

@@ -1,11 +1,18 @@
 import { useEffect, useState } from 'react'
 
+const TOUCH_QUERY = '(hover: none), (pointer: coarse)'
+
+/** Synchronous check, safe to call during the first render. */
+export function isTouchDevice() {
+  return typeof window !== 'undefined' && window.matchMedia(TOUCH_QUERY).matches
+}
+
 /** True on devices without a precise pointer (phones, tablets). */
 export function useIsTouch() {
-  const [isTouch, setIsTouch] = useState(false)
+  const [isTouch, setIsTouch] = useState(isTouchDevice)
 
   useEffect(() => {
-    const mq = window.matchMedia('(hover: none), (pointer: coarse)')
+    const mq = window.matchMedia(TOUCH_QUERY)
     const update = () => setIsTouch(mq.matches)
     update()
     mq.addEventListener('change', update)

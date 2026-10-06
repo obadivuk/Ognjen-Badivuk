@@ -5,15 +5,18 @@ import { EASE } from '../lib/motion'
 
 /**
  * Brief entry curtain: counts to 100, then wipes away upward to reveal the
- * hero. Skipped entirely under prefers-reduced-motion.
+ * hero. Skipped entirely under prefers-reduced-motion, and when `skip` is set
+ * (touch devices — on a phone it only delays the first meaningful paint).
  */
-export default function Preloader({ onDone }) {
+export default function Preloader({ onDone, skip = false }) {
   const reduced = useReducedMotion()
+  const off = skip || reduced
   const [progress, setProgress] = useState(0)
-  const [visible, setVisible] = useState(!reduced)
+  const [visible, setVisible] = useState(!off)
 
   useEffect(() => {
-    if (reduced) {
+    if (off) {
+      setVisible(false)
       onDone?.()
       return
     }
@@ -37,7 +40,7 @@ export default function Preloader({ onDone }) {
 
     raf = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(raf)
-  }, [reduced, onDone])
+  }, [off, onDone])
 
   return (
     <AnimatePresence>

@@ -19,9 +19,40 @@
     background-color: var(--ink);
   }
 
+  /*
+   * No background on <body>: because <html> has one, body's would paint over
+   * the fixed `-z-10` atmosphere layer (Background.jsx) and hide it entirely.
+   */
   body {
-    @apply bg-ink text-white font-sans antialiased;
+    @apply text-white font-sans antialiased;
     overflow-x: hidden;
+  }
+
+  /*
+   * `clip` stops sideways panning without turning <body> into a scroll
+   * container — with `hidden`, iOS Safari can trap vertical touch scrolling
+   * inside body and it intermittently stops responding.
+   */
+  @supports (overflow-x: clip) {
+    html,
+    body {
+      overflow-x: clip;
+    }
+  }
+
+  /*
+   * Content scrolls over a fixed background, so every frosted card has to
+   * re-blur what's behind it on every scroll frame. Phones can't keep up and
+   * it's a large share of iOS Safari's layer memory; the cards are already
+   * mostly opaque, so the visual difference is negligible.
+   */
+  @media (hover: none), (pointer: coarse) {
+    *,
+    *::before,
+    *::after {
+      -webkit-backdrop-filter: none !important;
+      backdrop-filter: none !important;
+    }
   }
 
   /* Lenis smooth scroll requirements */

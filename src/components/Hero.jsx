@@ -4,6 +4,7 @@ import { profile } from '../data/resume'
 import { EASE, charReveal } from '../lib/motion'
 import { MagneticButton } from './ui/Magnetic'
 import { scrollToSection } from '../hooks/useSmoothScroll'
+import { useIsTouch } from '../hooks/usePointer'
 import Portrait from './Portrait'
 import HeroBackdrop from './HeroBackdrop'
 
@@ -93,6 +94,7 @@ function RotatingDiscipline() {
 
 export default function Hero() {
   const ref = useRef(null)
+  const isTouch = useIsTouch()
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] })
 
   // Parallax: content drifts up and fades as you scroll past
@@ -113,7 +115,8 @@ export default function Hero() {
       <div className="container-x relative z-10">
         <div className="grid items-center gap-14 lg:grid-cols-[1.15fr_0.85fr] lg:gap-10">
           {/* ── Copy ─────────────────────────────────────────────── */}
-          <motion.div style={{ y: contentY, opacity, filter: blur }}>
+          {/* A scroll-driven filter re-rasterises the whole block every frame — too slow on phones */}
+          <motion.div style={{ y: contentY, opacity, filter: isTouch ? undefined : blur }}>
             {/* Availability chip */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}

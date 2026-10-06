@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useReducedMotion } from 'framer-motion'
+import { isTouchDevice } from '../hooks/usePointer'
 
 /**
  * The atmosphere layer, drawn on one canvas:
@@ -11,6 +12,10 @@ import { useReducedMotion } from 'framer-motion'
  * Everything is sized to devicePixelRatio and throttled to the display's own
  * refresh via rAF. The canvas sits behind all content and never intercepts
  * pointer events.
+ *
+ * On touch devices there is no cursor to react to, so a single static frame
+ * is drawn instead of a 60fps loop — it keeps the main thread free for
+ * scrolling and stops every translucent card above from re-compositing.
  */
 export default function Background() {
   const canvasRef = useRef(null)
@@ -33,13 +38,22 @@ export default function Background() {
     const INFLUENCE = 170
 
     const resize = () => {
+      const prevWidth = width
       dpr = Math.min(window.devicePixelRatio || 1, 2)
       width = canvas.clientWidth
       height = canvas.clientHeight
       canvas.width = Math.floor(width * dpr)
       canvas.height = Math.floor(height * dpr)
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-      seedParticles()
+      // Mobile browsers fire height-only resizes as the URL bar shows/hides
+      // during scroll; reseeding then would make the particles jump.
+      if (width !== prevWidth) seedParticles()
+    }
+
+    const drawStatic = () => {
+      ctx.clearRect(0, 0, width, height)
+      drawGrid()
+      drawParticles()
     }
 
     const seedParticles = () => {
@@ -156,13 +170,16 @@ export default function Background() {
       else cancelAnimationFrame(frame)
     }
 
+    const animate = !reduced && !isTouchDevice()
+    const onResize = () => {
+      resize()
+      if (!animate) drawStatic()
+    }
+
     resize()
 
-    if (reduced) {
-      // Draw one static frame and stop.
-      ctx.clearRect(0, 0, width, height)
-      drawGrid()
-      drawParticles()
+    if (!animate) {
+      drawStatic()
     } else {
       frame = requestAnimationFrame(render)
       window.addEventListener('pointermove', onPointerMove, { passive: true })
@@ -170,12 +187,12 @@ export default function Background() {
       document.addEventListener('visibilitychange', onVisibility)
     }
 
-    window.addEventListener('resize', resize)
+    window.addEventListener('resize', onResize)
 
     return () => {
       running = false
       cancelAnimationFrame(frame)
-      window.removeEventListener('resize', resize)
+      window.removeEventListener('resize', onResize)
       window.removeEventListener('pointermove', onPointerMove)
       document.removeEventListener('pointerleave', onPointerLeave)
       document.removeEventListener('visibilitychange', onVisibility)
@@ -184,10 +201,15 @@ export default function Background() {
 
   return (
     <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-ink noise">
-      {/* Static aurora blobs — cheap depth behind the canvas */}
-      <div className="absolute -left-40 top-[-10%] h-[520px] w-[520px] rounded-full bg-accent/[0.07] blur-[140px]" />
-      <div className="absolute right-[-15%] top-[35%] h-[620px] w-[620px] rounded-full bg-accent-deep/[0.10] blur-[160px]" />
-      <div className="absolute bottom-[-10%] left-[25%] h-[480px] w-[480px] rounded-full bg-sage/[0.04] blur-[150px]" />
+      {/*
+        Static aurora blobs. Radial gradients rather than `blur()` on solid
+        discs: a 150px blur on a 600px element needs a backing store several
+        times its size at device pixel ratio, and iOS Safari kills the tab
+        when a page's layers exceed its memory budget.
+      */}
+      <div className="absolute left-[-24rem] top-[-28%] h-[64rem] w-[64rem] bg-[radial-gradient(closest-side,rgba(78,159,61,0.07),transparent)]" />
+      <div className="absolute right-[-38rem] top-[8%] h-[76rem] w-[76rem] bg-[radial-gradient(closest-side,rgba(47,107,36,0.10),transparent)]" />
+      <div className="absolute bottom-[-36%] left-[10%] h-[60rem] w-[60rem] bg-[radial-gradient(closest-side,rgba(163,193,173,0.04),transparent)]" />
 
       <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
 

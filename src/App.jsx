@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useSmoothScroll } from './hooks/useSmoothScroll'
+import { isTouchDevice } from './hooks/usePointer'
 import { EASE } from './lib/motion'
 
 import Preloader from './components/Preloader'
@@ -17,21 +18,22 @@ import Contact from './components/Contact'
 import Footer from './components/Footer'
 
 export default function App() {
-  const [ready, setReady] = useState(false)
+  const [skipIntro] = useState(isTouchDevice)
+  const [ready, setReady] = useState(skipIntro)
   useSmoothScroll()
 
   const handleDone = useCallback(() => setReady(true), [])
 
   return (
     <>
-      <Preloader onDone={handleDone} />
+      <Preloader onDone={handleDone} skip={skipIntro} />
       <Background />
       <CustomCursor />
       <ScrollProgress />
       <Navbar />
 
       <motion.main
-        initial={{ opacity: 0 }}
+        initial={skipIntro ? false : { opacity: 0 }}
         animate={{ opacity: ready ? 1 : 0 }}
         transition={{ duration: 0.8, ease: EASE }}
       >

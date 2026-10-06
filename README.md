@@ -81,6 +81,11 @@ expo-out `[0.16, 1, 0.3, 1]`; retime the whole site by editing that one file.
 Everything honours `prefers-reduced-motion`: Lenis, the canvas loop, the preloader, the tilt
 and the float all switch off, and `index.css` collapses remaining transitions.
 
+Touch devices (`(hover: none), (pointer: coarse)`) get a lighter build of the same page: no
+Lenis (native scrolling — Lenis's non-passive touch listeners made swipes stutter), no
+preloader, a single static canvas frame instead of the 60fps loop, no `backdrop-filter`, and
+no scroll-driven blur on the hero. This is what keeps iOS Safari inside its memory budget.
+
 ## Two implementation notes worth knowing
 
 **Why the hero name's gradient is per-character.** An element with `perspective`, or with a
